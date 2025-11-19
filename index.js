@@ -6,6 +6,9 @@ function generateUniqueId() {
   // TODO: Implementasi fungsi untuk menghasilkan ID unik
   // Ini akan digunakan secara internal untuk setiap objek to-do
   // Contoh: Gabungan waktu saat ini dan angka acak
+  const timestamp = Date.now().toString(36);
+  const randomStr = Math.random().toString(36).substring(2, 8);
+  return `${timestamp}-${randomStr}`;
 }
 
 function addTodo() {
@@ -15,6 +18,21 @@ function addTodo() {
   // 3. Buat objek to-do baru dengan properti: id (dari generateUniqueId), text, dan isCompleted (boolean, default false)
   // 4. Tambahkan objek to-do ini ke array `todos`
   // 5. Beri feedback ke user bahwa to-do berhasil ditambahkan
+  const text = prompt("Masukkan To-do:");
+
+  if (!text.trim()) {
+    console.log("To-do tidak boleh kosong.");
+    return;
+  }
+
+  const todo = {
+    id: generateUniqueId(),
+    text,
+    isCompleted: false,
+  };
+
+  todos.push(todo);
+  console.log(`Ditambahkan: "${text}"`);
 }
 
 function markTodoCompleted() {
@@ -25,6 +43,30 @@ function markTodoCompleted() {
   // 4. Ubah properti `isCompleted` dari to-do yang dipilih menjadi `true`
   // 5. Beri feedback ke user bahwa to-do berhasil ditandai selesai
   // 6. Tangani kasus jika to-do sudah selesai
+  if (todos.length === 0) {
+    console.log("Tidak ada yang ditandai.");
+    return;
+  }
+
+  listTodos();
+
+  const input = prompt("Masukkan nomor to-do yang ditandai selesai:");
+  const num = parseInt(input);
+
+  if (isNaN(num) || num < 1 || num > todos.length) {
+    console.log("Invalid!");
+    return;
+  }
+
+  const todo = todos[num - 1];
+
+  if (todo.isCompleted) {
+    console.log(`To-do "${todo.text}" sudah selesai.`);
+    return;
+  }
+
+  todo.isCompleted = true;
+  console.log(`To-do "${todo.text}" ditandai selesai.`);
 }
 
 function deleteTodo() {
@@ -34,6 +76,23 @@ function deleteTodo() {
   // 3. Validasi input: Pastikan nomor adalah angka, dalam rentang yang valid
   // 4. Hapus to-do yang dipilih dari array `todos`
   // 5. Beri feedback ke user bahwa to-do berhasil dihapus
+  if (todos.length === 0) {
+    console.log("Tidak ada to-do untuk dihapus.");
+    return;
+  }
+
+  listTodos();
+
+  const input = prompt("Masukkan nomor to-do yang mau dihapus:");
+  const num = parseInt(input);
+
+  if (isNaN(num) || num < 1 || num > todos.length) {
+    console.log("Invalid!");
+    return;
+  }
+
+  const removed = todos.splice(num - 1, 1)[0];
+  console.log(`To-do "${removed.text}" dihapus.`);
 }
 
 function listTodos() {
@@ -44,11 +103,27 @@ function listTodos() {
   // 4. Untuk setiap to-do, tampilkan nomor urut, status ([DONE] atau [ACTIVE]), dan teks to-do
   //    Contoh format: "1. [ACTIVE] | Belajar JavaScript"
   // 5. Tampilkan garis penutup daftar
+  console.log("\n--- YOUR TO-DO LIST ---");
+
+  if (todos.length === 0) {
+    console.log("(empty)");
+    console.log("-----------------------\n");
+    return;
+  }
+
+  todos.forEach((todo, index) => {
+    const status = todo.isCompleted ? "[DONE]" : "[ACTIVE]";
+    console.log(`${index + 1}. ${status} | ${todo.text}`);
+  });
+
+  console.log("-----------------------\n");
 }
 
 function runTodoApp() {
   // TODO: Implementasi logika utama aplikasi (menu interaktif)
   // Ini adalah "otak" aplikasi yang terus berjalan sampai user memilih untuk keluar
+  console.log("===== INTERACTIVE TO-DO LIST =====");
+
   let running = true;
   while (running) {
     // 1. Tampilkan menu perintah yang tersedia (add, complete, delete, list, exit)
@@ -57,6 +132,42 @@ function runTodoApp() {
     //    berdasarkan perintah yang dimasukkan user
     // 4. Tangani perintah 'exit' untuk menghentikan loop aplikasi
     // 5. Tangani input perintah yang tidak valid
+    console.log(`
+ Choose an action:
+ 1. Tambahkan To-Do
+ 2. Tandai To-Do Yang Selesai
+ 3. Hapus To-Do
+ 4. Tampilkan Semua To-Do
+ 5. Exit
+  `);
+
+    const choice = prompt("Masukkan Pilihan Kamu (1-5): ");
+
+    switch (choice) {
+      case "1":
+        addTodo();
+        break;
+
+      case "2":
+        markTodoCompleted();
+        break;
+
+      case "3":
+        deleteTodo();
+        break;
+
+      case "4":
+        listTodos();
+        break;
+
+      case "5":
+        running = false;
+        console.log("Exiting app...");
+        break;
+
+      default:
+        console.log("Invalid! Masukkan 1-5.");
+    }
   }
 }
 
